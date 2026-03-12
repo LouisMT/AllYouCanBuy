@@ -1,57 +1,45 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using KitchenData;
+using AllYouCanBuy.Constants;
 
 namespace AllYouCanBuy.Helpers
 {
     public class ApplianceHelper
     {
-        private static readonly HashSet<string> ApplianceNames = new HashSet<string>
-        {
-            "Smart Grabber",
-            "Heated Mixer",
-            "Conveyor Mixer",
-            "Rapid Mixer",
-            "Composter Bin",
-            "Kitchen Floor Protector",
-            "Conveyor",
-            "Combiner",
-            "Portioner",
-            "Workstation",
-            "Danger Hob",
-            "Safety Hob",
-            "Microwave",
-            "Auto Plater",
-            "Plates",
-            "Frozen Prep Station",
-            "Dish Washer",
-            "Buffet",
-            "Grabber",
-            "Grabber - Rotating"
+        private static readonly int[] ApplianceIds = {
+            ApplianceId.SmartGrabber,
+            ApplianceId.HeatedMixer,
+            ApplianceId.ConveyorMixer,
+            ApplianceId.RapidMixer,
+            ApplianceId.ComposterBin,
+            ApplianceId.KitchenFloorProtector,
+            ApplianceId.Conveyor,
+            ApplianceId.Combiner,
+            ApplianceId.Portioner,
+            ApplianceId.Workstation,
+            ApplianceId.DangerHob,
+            ApplianceId.SafetyHob,
+            ApplianceId.Microwave,
+            ApplianceId.AutoPlater,
+            ApplianceId.Plates,
+            ApplianceId.FrozenPrepStation,
+            ApplianceId.DishWasher,
+            ApplianceId.Buffet,
+            ApplianceId.Grabber,
+            ApplianceId.GrabberRotating
         };
-
-        private readonly List<int> _applianceIds;
 
         private int _currentApplianceIndex;
 
-        public ApplianceHelper()
-        {
-            _applianceIds = GameData.Main.Get<Appliance>()
-                .Where(a => ApplianceNames.Contains(a.Name))
-                .Select(a => a.ID)
-                .ToList();
-        }
-
         public IEnumerable<int> GetApplianceIds()
         {
-            for (var i = 0; i < _applianceIds.Count; i++)
+            for (var i = 0; i < ApplianceIds.Length; i++)
             {
-                if (_currentApplianceIndex >= _applianceIds.Count)
+                if (_currentApplianceIndex >= ApplianceIds.Length)
                 {
                     _currentApplianceIndex = 0;
                 }
 
-                yield return _applianceIds[_currentApplianceIndex++];
+                yield return ApplianceIds[_currentApplianceIndex++];
             }
         }
     }
