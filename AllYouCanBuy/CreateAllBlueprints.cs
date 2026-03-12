@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using AllYouCanBuy.Helpers;
 using Kitchen;
-using KitchenData;
 using KitchenMods;
 using Unity.Entities;
 using UnityEngine;
@@ -11,42 +10,9 @@ namespace AllYouCanBuy
     [UpdateInGroup(typeof(EndOfDayProgressionGroup))]
     public class CreateAllBlueprints : StartOfNightSystem, IModSystem
     {
-        private static readonly HashSet<string> ApplianceNames = new HashSet<string>
-        {
-            "Smart Grabber",
-            "Heated Mixer",
-            "Conveyor Mixer",
-            "Rapid Mixer",
-            "Composter Bin",
-            "Kitchen Floor Protector",
-            "Conveyor",
-            "Combiner",
-            "Portioner",
-            "Workstation",
-            "Danger Hob",
-            "Safety Hob",
-            "Microwave",
-            "Auto Plater",
-            "Plates",
-            "Frozen Prep Station",
-            "Dish Washer",
-            "Buffet",
-            "Grabber",
-            "Grabber - Rotating"
-        };
+        private readonly ApplianceHelper _applianceHelper = new ApplianceHelper();
 
-        private List<int> _applianceIds = new List<int>();
         private EntityQuery _dayQuery;
-
-        protected override void Initialise()
-        {
-            base.Initialise();
-
-            _applianceIds = GameData.Main.Get<Appliance>()
-                .Where(a => ApplianceNames.Contains(a.Name))
-                .Select(a => a.ID)
-                .ToList();
-        }
 
         protected override void OnCreateForCompiler()
         {
@@ -65,7 +31,7 @@ namespace AllYouCanBuy
             var freeTiles = FindFreeTiles();
             Debug.Log($"Found {freeTiles.Count} free tiles");
 
-            foreach (var applianceId in _applianceIds)
+            foreach (var applianceId in _applianceHelper.GetApplianceIds())
             {
                 if (freeTiles.TryDequeue(out var freeTile))
                 {
