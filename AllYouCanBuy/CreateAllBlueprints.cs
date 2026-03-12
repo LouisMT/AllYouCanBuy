@@ -14,7 +14,25 @@ namespace AllYouCanBuy
         private static readonly HashSet<string> ApplianceNames = new HashSet<string>
         {
             "Smart Grabber",
-            "Mixer"
+            "Heated Mixer",
+            "Conveyor Mixer",
+            "Rapid Mixer",
+            "Composter Bin",
+            "Kitchen Floor Protector",
+            "Conveyor",
+            "Combiner",
+            "Portioner",
+            "Workstation",
+            "Danger Hob",
+            "Safety Hob",
+            "Microwave",
+            "Auto Plater",
+            "Plates",
+            "Frozen Prep Station",
+            "Dish Washer",
+            "Buffet",
+            "Grabber",
+            "Grabber - Rotating"
         };
 
         private List<int> _applianceIds = new List<int>();
@@ -63,18 +81,24 @@ namespace AllYouCanBuy
 
         private Queue<Vector3> FindFreeTiles()
         {
+            var namePlate = GetNameplateTile();
+            var reroll = GetRerollTile();
+            var practice = GetPracticeTile();
+
             var tiles = new Queue<Vector3>();
 
-            for (var z = Mathf.RoundToInt(Bounds.min.z); z <= Mathf.RoundToInt(Bounds.max.z); z++)
+            for (var x = Bounds.min.x; x <= Bounds.max.x; x++)
             {
-                for (var x = Mathf.RoundToInt(Bounds.min.x); x <= Mathf.RoundToInt(Bounds.max.x); x++)
+                for (var z = reroll.z - 1; z <= reroll.z; z++)
                 {
-                    var candidate = new Vector3(x, 0f, z);
+                    var position = new Vector3(x, 0, z);
 
-                    if (TileManager.IsSuitableEmptyTile(candidate))
+                    if (position == namePlate || position == reroll || position == practice)
                     {
-                        tiles.Enqueue(candidate);
+                        continue;
                     }
+
+                    tiles.Enqueue(position);
                 }
             }
 
