@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PlateUpGamePath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\PlateUp\PlateUp</PlateUpGamePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="Kitchen.Common">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Kitchen.Common.dll</HintPath>
+      </Reference>
+      <Reference Include="Kitchen.GameData">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Kitchen.GameData.dll</HintPath>
+      </Reference>
+      <Reference Include="Kitchen.RestaurantMode">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Kitchen.RestaurantMode.dll</HintPath>
+      </Reference>
+      <Reference Include="KitchenMode">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\KitchenMode.dll</HintPath>
+      </Reference>
+      <Reference Include="KitchenMods">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\KitchenMods.dll</HintPath>
+      </Reference>
+      <Reference Include="Unity.Entities">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Unity.Entities.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.CoreModule">
+        <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <Target Name="CopyToPlateUpMods" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        <PropertyGroup>
+            <ModOutputPath>$(PlateUpGamePath)\Mods\AllYouCanBuy\content\</ModOutputPath>
+        </PropertyGroup>
+        <MakeDir Directories="$(ModOutputPath)" />
+        <Copy SourceFiles="$(OutputPath)AllYouCanBuy.dll" DestinationFolder="$(ModOutputPath)" />
+    </Target>
+</Project>
