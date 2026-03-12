@@ -57,3 +57,5 @@ TestResult.xml
 nunit-*.xml
 
 *.DotSettings.user
+
+Build.local.props
