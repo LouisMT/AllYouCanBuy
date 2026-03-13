@@ -30,7 +30,7 @@ namespace AllYouCanBuy.Helpers
 
         private int _currentApplianceIndex;
 
-        public IEnumerable<int> GetApplianceIds()
+        public IEnumerable<int> CycleApplianceIds()
         {
             for (var i = 0; i < ApplianceIds.Length; i++)
             {

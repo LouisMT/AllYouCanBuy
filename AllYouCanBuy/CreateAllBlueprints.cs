@@ -31,17 +31,14 @@ namespace AllYouCanBuy
             var freeTiles = FindFreeTiles();
             Debug.Log($"Found {freeTiles.Count} free tiles");
 
-            foreach (var applianceId in _applianceHelper.GetApplianceIds())
+            using var applianceIds = _applianceHelper
+                .CycleApplianceIds()
+                .GetEnumerator();
+
+            while (freeTiles.TryDequeue(out var freeTile) && applianceIds.MoveNext())
             {
-                if (freeTiles.TryDequeue(out var freeTile))
-                {
-                    Debug.Log($"Spawning {applianceId} at {freeTile}");
-                    PostHelpers.CreateOpenedLetter(EntityManager, freeTile, applianceId);
-                }
-                else
-                {
-                    Debug.LogWarning("No free tile found");
-                }
+                Debug.Log($"Spawning {applianceIds.Current} at {freeTile}");
+                PostHelpers.CreateOpenedLetter(EntityManager, freeTile, applianceIds.Current);
             }
         }
 
