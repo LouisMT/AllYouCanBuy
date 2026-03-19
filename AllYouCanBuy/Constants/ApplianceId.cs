@@ -63,6 +63,8 @@
         // Only given when Plates are present.
         public const int DishRack = 434150763;
 
+        public const int Oven = -1068749602;
+
         // Starters
         public const int StarterSink = -266993023;
         public const int StarterBin = 481495292;

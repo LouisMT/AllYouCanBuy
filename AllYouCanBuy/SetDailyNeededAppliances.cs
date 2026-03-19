@@ -68,8 +68,9 @@ namespace AllYouCanBuy
                     )
                     .SelectMany(id => id switch
                     {
-                        // If Plates are present, add DishRack next to Plates in the shop.
+                        // Add extra appliances based on what's in the shop already.
                         ApplianceId.Plates => new[] { ApplianceId.Plates, ApplianceId.DishRack },
+                        ApplianceId.Oven => new[] { ApplianceId.Oven, ApplianceId.Hob },
                         _ => new[] { id }
                     })
             );
