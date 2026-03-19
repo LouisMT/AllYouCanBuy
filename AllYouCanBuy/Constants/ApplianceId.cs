@@ -61,7 +61,7 @@
         public const int Plates = 1313469794;
 
         // Only given when Plates are present.
-        public const int DishRack = 1653145961;
+        public const int DishRack = 434150763;
 
         // Starters
         public const int StarterSink = -266993023;
