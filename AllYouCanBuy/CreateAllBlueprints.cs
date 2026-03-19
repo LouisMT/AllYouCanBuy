@@ -8,30 +8,14 @@ using UnityEngine;
 namespace AllYouCanBuy
 {
     [UpdateInGroup(typeof(EndOfDayProgressionGroup))]
-    public class CreateAllBlueprints : StartOfNightSystem, IModSystem
+    public class CreateAllBlueprints : ShopSystem, IModSystem
     {
-        private readonly ApplianceHelper _applianceHelper = new ApplianceHelper();
-
-        private EntityQuery _dayQuery;
-
-        protected override void OnCreateForCompiler()
+        protected override void OnShopUpdate()
         {
-            base.OnCreateForCompiler();
-
-            _dayQuery = GetEntityQuery(ComponentType.ReadOnly<SDay>());
-        }
-
-        protected override void OnUpdate()
-        {
-            if (HasSingleton<SIsRestartedDay>() || _dayQuery.GetSingleton<SDay>().Day <= 0)
-            {
-                return;
-            }
-
             var freeTiles = FindFreeTiles();
             Debug.Log($"Found {freeTiles.Count} free tiles");
 
-            using var applianceIds = _applianceHelper
+            using var applianceIds = ApplianceHelper.Main
                 .CycleApplianceIds()
                 .GetEnumerator();
 
