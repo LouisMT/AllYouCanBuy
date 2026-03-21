@@ -1,0 +1,21 @@
+﻿when:
+  - event: push
+    branch: main
+  - event: manual
+
+steps:
+  - name: dependencies
+    image: cm2network/steamcmd:root
+    commands:
+      - chown -R root:root /home/steam
+      - /home/steam/steamcmd/steamcmd.sh +login "$$STEAM_USERNAME" "$$STEAM_PASSWORD" +app_update 1755940 +quit
+      - cp -a "/root/Steam/steamapps/common/PlateUp! Demo" PlateUp
+    environment:
+      STEAM_USERNAME:
+        from_secret: STEAM_USERNAME
+      STEAM_PASSWORD:
+        from_secret: STEAM_PASSWORD
+  - name: build
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    commands:
+      - dotnet build -p "PlateUpGamePath=$$(pwd)/PlateUp/PlateUp" -c Release
