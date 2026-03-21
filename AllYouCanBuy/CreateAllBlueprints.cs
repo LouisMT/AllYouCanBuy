@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AllYouCanBuy.Helpers;
 using Kitchen;
 using KitchenMods;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
@@ -10,6 +12,14 @@ namespace AllYouCanBuy
     [UpdateInGroup(typeof(EndOfDayProgressionGroup))]
     public class CreateAllBlueprints : ShopSystem, IModSystem
     {
+        private EntityQuery _discounts;
+
+        protected override void Initialise()
+        {
+            base.Initialise();
+            _discounts = GetEntityQuery(typeof(CGrantsShopDiscount));
+        }
+
         protected override void OnShopUpdate()
         {
             var freeTiles = FindFreeTiles();
@@ -19,10 +29,19 @@ namespace AllYouCanBuy
                 .CycleApplianceIds()
                 .GetEnumerator();
 
+            var priceMultiplier = _discounts // Apply all discounts.
+                .ToComponentDataArray<CGrantsShopDiscount>(Allocator.Temp)
+                .Aggregate(1f, (current, discount) => current * (1f - discount.Amount));
+
             while (freeTiles.TryDequeue(out var freeTile) && applianceIds.MoveNext())
             {
                 Debug.Log($"Spawning {applianceIds.Current} at {freeTile}");
-                PostHelpers.CreateOpenedLetter(EntityManager, freeTile, applianceIds.Current);
+                PostHelpers.CreateOpenedLetter(
+                    EntityManager,
+                    freeTile,
+                    applianceIds.Current,
+                    priceMultiplier
+                );
             }
         }
 
