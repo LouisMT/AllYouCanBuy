@@ -33,11 +33,11 @@
         </Reference>
     </ItemGroup>
 
-    <Target Name="CopyToPlateUpMods" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="CopyToPlateUpMods" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' And '$(CI)' == ''">
         <PropertyGroup>
-            <ModOutputPath>$(PlateUpGamePath)\Mods\AllYouCanBuy\content\</ModOutputPath>
+            <ModDir>$(PlateUpGamePath)/Mods/AllYouCanBuy/content</ModDir>
         </PropertyGroup>
         <MakeDir Directories="$(ModOutputPath)"/>
-        <Copy SourceFiles="$(OutputPath)AllYouCanBuy.dll" DestinationFolder="$(ModOutputPath)"/>
+        <Copy SourceFiles="$(OutDir)AllYouCanBuy.dll" DestinationFolder="$(ModDir)"/>
     </Target>
 </Project>

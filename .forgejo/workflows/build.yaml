@@ -1,0 +1,74 @@
+﻿on:
+  pull_request:
+  push:
+    branches:
+      - main
+  release:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: codeberg-medium
+    env:
+      DOTNET_NOLOGO: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v5
+        with:
+          path: PlateUp/**/*.dll
+          key: dependencies
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+      - name: Install SteamCMD
+        if: steps.cache-dependencies.outputs.cache-hit != 'true' || forgejo.event_name == 'workflow_dispatch'
+        run: &install_steamcmd_run |
+          apt-get update
+          apt-get install -y lib32gcc-s1
+          mkdir steamcmd
+          curl -fL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar -xz -C steamcmd
+      - name: Download dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true' || forgejo.event_name == 'workflow_dispatch'
+        env:
+          STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
+          STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
+        run: |
+          ./steamcmd/steamcmd.sh +login "$STEAM_USERNAME" "$STEAM_PASSWORD" +app_update 1599600 +quit
+          mv /root/Steam/steamapps/common/PlateUp PlateUp
+      - name: Lint
+        run: dotnet format --verify-no-changes
+      - name: Build
+        run: dotnet build AllYouCanBuy -p "PlateUpGamePath=$(pwd)/PlateUp/PlateUp" -c Release -o build
+      - name: Upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/AllYouCanBuy.dll
+
+  upload-to-workshop:
+    name: Upload to workshop
+    if: forgejo.event_name == 'release'
+    runs-on: codeberg-small
+    needs:
+      - build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: workshop/content
+      - name: Install SteamCMD
+        run: *install_steamcmd_run
+      - name: Upload to workshop
+        env:
+          STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
+          STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
+        run: |
+          sed -i "s|REPLACE_CONTENTFOLDER|$(pwd)/workshop/content|g" workshop/AllYouCanBuy.vdf
+          sed -i "s|REPLACE_CHANGENOTE|Version ${{ forgejo.ref_name }}|g" workshop/AllYouCanBuy.vdf
+          ./steamcmd/steamcmd.sh +login "$STEAM_USERNAME" "$STEAM_PASSWORD" +workshop_build_item "$(pwd)/workshop/AllYouCanBuy.vdf" +quit

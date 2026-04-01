@@ -16,7 +16,7 @@
         public const int ClipboardStand = -2070005162;
 
         public const int Sink = 1083874952;
-        
+
         public const int Mop = -1993346570;
         public const int FloorBuffer = 1351951642;
         public const int KitchenFloorProtector = 1765889988;
