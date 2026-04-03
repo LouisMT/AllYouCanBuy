@@ -24,7 +24,7 @@ namespace AllYouCanBuy
             { ApplianceId.StarterHob, ApplianceId.Hob },
             { ApplianceId.StarterPlates, ApplianceId.Plates }
         };
-        
+
         private EntityQuery _menuItemsQuery;
         private EntityQuery _possibleExtrasQuery;
 
