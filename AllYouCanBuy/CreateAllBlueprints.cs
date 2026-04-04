@@ -40,7 +40,7 @@ namespace AllYouCanBuy
                 PostHelpers.CreateOpenedLetter(
                     EntityManager,
                     freeTile,
-                    applianceId,
+                    (int)applianceId,
                     priceMultiplier
                 );
             }

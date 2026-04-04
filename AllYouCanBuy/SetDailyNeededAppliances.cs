@@ -17,7 +17,7 @@ namespace AllYouCanBuy
     {
         // Enabling appliances are always starters, we want the base version in the shop.
         // (For example, for Steak a Starter Hob is given as enabling appliance).
-        private static readonly Dictionary<int, int> StarterToBaseApplianceIds = new Dictionary<int, int>
+        private static readonly Dictionary<ApplianceId, ApplianceId> StarterToBaseApplianceIds = new Dictionary<ApplianceId, ApplianceId>
         {
             { ApplianceId.StarterSink, ApplianceId.Sink },
             { ApplianceId.StarterBin, ApplianceId.Bin },
@@ -59,6 +59,7 @@ namespace AllYouCanBuy
                             .SelectApplianceIdsFromItems()
                     )
                     .Distinct()
+                    .Select(id => (ApplianceId)id)
                     // Map starters to base (e.g. Starter Hob to Hob)
                     // ReSharper disable once CanSimplifyDictionaryTryGetValueWithGetValueOrDefault
                     //                        ^ (does not work in Unity)

@@ -11,7 +11,7 @@ namespace AllYouCanBuy.Helpers
 {
     public static class ApplianceHelper
     {
-        private static readonly int[] BaseApplianceIds =
+        private static readonly ApplianceId[] BaseApplianceIds =
         {
             ApplianceId.Counter,
             ApplianceId.PrepStation,
@@ -55,7 +55,7 @@ namespace AllYouCanBuy.Helpers
             ApplianceId.WorkBoots
         };
 
-        public static int[] CycleApplianceIds(GenericSystemBase system, int count)
+        public static ApplianceId[] CycleApplianceIds(GenericSystemBase system, int count)
         {
             var dailyApplianceIds = GetDailyAppliances(system)
                 .ToNativeArray(Allocator.Temp)
@@ -66,7 +66,7 @@ namespace AllYouCanBuy.Helpers
                 .Distinct()
                 .ToArray();
 
-            var result = new int[count];
+            var result = new ApplianceId[count];
             var currentApplianceIndex = GetCurrentApplianceIndex(system);
             Debug.Log($"Cycling {count} appliance IDs, starting at {currentApplianceIndex} ({allApplianceIds.Length} unique appliances available)");
 
@@ -85,7 +85,7 @@ namespace AllYouCanBuy.Helpers
             return result;
         }
 
-        public static void SetDailyApplianceIds(GenericSystemBase system, IEnumerable<int> dailyApplianceIds)
+        public static void SetDailyApplianceIds(GenericSystemBase system, IEnumerable<ApplianceId> dailyApplianceIds)
         {
             var dailyApplianceIdBuffer = GetDailyAppliances(system);
 
