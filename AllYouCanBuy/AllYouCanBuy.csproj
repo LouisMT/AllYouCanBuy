@@ -33,7 +33,7 @@
         </Reference>
     </ItemGroup>
 
-    <Target Name="CopyToPlateUpMods" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' And '$(CI)' == ''">
+    <Target Name="CopyToPlateUpMods" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' And '$(AutoCopyMod)' == 'true'">
         <PropertyGroup>
             <ModDir>$(PlateUpGamePath)/Mods/AllYouCanBuy/content</ModDir>
         </PropertyGroup>
