@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace AllYouCanBuy.Helpers
 {
-    public class ApplianceHelper
+    public static class ApplianceHelper
     {
         private static readonly int[] BaseApplianceIds =
         {
