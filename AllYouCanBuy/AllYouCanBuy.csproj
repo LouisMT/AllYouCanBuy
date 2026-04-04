@@ -25,6 +25,9 @@
         <Reference Include="KitchenMods">
             <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\KitchenMods.dll</HintPath>
         </Reference>
+        <Reference Include="Unity.Collections">
+            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Unity.Collections.dll</HintPath>
+        </Reference>
         <Reference Include="Unity.Entities">
             <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Unity.Entities.dll</HintPath>
         </Reference>

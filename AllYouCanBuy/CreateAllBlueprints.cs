@@ -25,33 +25,34 @@ namespace AllYouCanBuy
             var freeTiles = FindFreeTiles();
             Debug.Log($"Found {freeTiles.Count} free tiles");
 
-            using var applianceIds = ApplianceHelper.Main
-                .CycleApplianceIds()
-                .GetEnumerator();
+            var applianceIds = ApplianceHelper.CycleApplianceIds(this, freeTiles.Count);
 
             var priceMultiplier = _discounts // Apply all discounts.
                 .ToComponentDataArray<CGrantsShopDiscount>(Allocator.Temp)
                 .Aggregate(1f, (current, discount) => current * (1f - discount.Amount));
 
-            while (freeTiles.TryDequeue(out var freeTile) && applianceIds.MoveNext())
+            for (var i = 0; i < freeTiles.Count; i++)
             {
-                Debug.Log($"Spawning {applianceIds.Current} at {freeTile}");
+                var freeTile = freeTiles[i];
+                var applianceId = applianceIds[i];
+
+                Debug.Log($"Spawning {applianceId} at {freeTile}");
                 PostHelpers.CreateOpenedLetter(
                     EntityManager,
                     freeTile,
-                    applianceIds.Current,
+                    applianceId,
                     priceMultiplier
                 );
             }
         }
 
-        private Queue<Vector3> FindFreeTiles()
+        private List<Vector3> FindFreeTiles()
         {
             var namePlate = GetNameplateTile();
             var reroll = GetRerollTile();
             var practice = GetPracticeTile();
 
-            var tiles = new Queue<Vector3>();
+            var tiles = new List<Vector3>();
 
             for (var x = Bounds.min.x; x <= Bounds.max.x; x++)
             {
@@ -64,7 +65,7 @@ namespace AllYouCanBuy
                         continue;
                     }
 
-                    tiles.Enqueue(position);
+                    tiles.Add(position);
                 }
             }
 
