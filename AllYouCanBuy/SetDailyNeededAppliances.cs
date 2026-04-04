@@ -41,7 +41,7 @@ namespace AllYouCanBuy
             var menuItemIds = menuItems.Select(m => m.Item).ToList();
             using var possibleExtras = _possibleExtrasQuery.ToComponentDataArray<CPossibleExtra>(Allocator.Temp);
 
-            ApplianceHelper.Main.SetDailyApplianceIds(
+            var dailyApplianceIds =
                 menuItems
                     .Select(m => GameData.Main.Get<Dish>(m.SourceDish))
                     .SelectMany(d => d.RequiredProcesses
@@ -72,8 +72,9 @@ namespace AllYouCanBuy
                         ApplianceId.Plates => new[] { ApplianceId.Plates, ApplianceId.DishRack },
                         ApplianceId.Oven => new[] { ApplianceId.Oven, ApplianceId.Hob },
                         _ => new[] { id }
-                    })
-            );
+                    });
+
+            ApplianceHelper.SetDailyApplianceIds(this, dailyApplianceIds);
         }
     }
 

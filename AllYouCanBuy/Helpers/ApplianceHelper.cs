@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AllYouCanBuy.Components;
 using AllYouCanBuy.Constants;
-
+using Kitchen;
+using Unity.Collections;
+using Unity.Entities;
+using UnityEngine;
 
 namespace AllYouCanBuy.Helpers
 {
     public class ApplianceHelper
     {
-        public static ApplianceHelper Main = new ApplianceHelper();
-
         private static readonly int[] BaseApplianceIds =
         {
             ApplianceId.Counter,
@@ -53,26 +56,91 @@ namespace AllYouCanBuy.Helpers
             ApplianceId.WorkBoots
         };
 
-        // Appliance IDs needed for the specific dishes.
-        private int[] _dailyApplianceIds = { };
-
-        private int _currentApplianceIndex;
-
-        public IEnumerable<int> CycleApplianceIds()
+        public static int[] CycleApplianceIds(GenericSystemBase system, int count)
         {
-            var allApplianceIds = BaseApplianceIds.Concat(_dailyApplianceIds).Distinct().ToArray();
+            var dailyAppliancesEntity = system.GetSingletonEntity<SDailyAppliances>();
+            var dailyApplianceIdBuffer = system.EntityManager.GetBuffer<SDailyApplianceId>(dailyAppliancesEntity)
+                .ToNativeArray(Allocator.Temp);
+            
+            var allApplianceIds = BaseApplianceIds
+                .Concat(dailyApplianceIdBuffer
+                    .Select(s => s.Value)
+                )
+                .Distinct()
+                .ToArray();
 
-            for (var i = 0; i < allApplianceIds.Length; i++)
+            var result = new int[count];
+            var currentApplianceIndex = GetCurrentApplianceIndex(system);
+            Debug.Log($"Cycling {count} appliance IDs, starting at {currentApplianceIndex}");
+
+            for (var i = 0; i < count; i++)
             {
-                if (_currentApplianceIndex >= allApplianceIds.Length)
+                if (currentApplianceIndex >= allApplianceIds.Length)
                 {
-                    _currentApplianceIndex = 0;
+                    currentApplianceIndex = 0;
                 }
+                
+                result[i] = allApplianceIds[currentApplianceIndex++];
+            }
 
-                yield return allApplianceIds[_currentApplianceIndex++];
+            SetCurrentApplianceIndex(system, currentApplianceIndex);
+
+            return result;
+        }
+
+        public static void SetDailyApplianceIds(GenericSystemBase system, IEnumerable<int> dailyApplianceIds)
+        {
+            if (system is null)
+            {
+                throw new InvalidOperationException("InitialiseApplianceHelper must be called first");
+            }
+
+            var dailyApplianceIdBuffer = GetDailyAppliances(system);
+
+            dailyApplianceIdBuffer.Clear();
+
+            foreach (var dailyApplianceId in dailyApplianceIds)
+            {
+                dailyApplianceIdBuffer.Add(new SDailyApplianceId
+                {
+                    Value = dailyApplianceId
+                });
             }
         }
 
-        public void SetDailyApplianceIds(IEnumerable<int> ids) => _dailyApplianceIds = ids.ToArray();
+        private static int GetCurrentApplianceIndex(GenericSystemBase system)
+        {
+            if (!system.HasSingleton<SCurrentApplianceIndex>())
+            {
+                var entity = system.EntityManager.CreateEntity();
+                system.EntityManager.AddComponentData(entity, new SCurrentApplianceIndex
+                {
+                    Value = 0
+                });
+            }
+
+            return system.GetSingleton<SCurrentApplianceIndex>().Value;
+        }
+
+        private static void SetCurrentApplianceIndex(GenericSystemBase system, int currentApplianceIndex)
+        {
+            system.SetSingleton(new SCurrentApplianceIndex
+            {
+                Value = currentApplianceIndex
+            });
+        }
+
+        private static DynamicBuffer<SDailyApplianceId> GetDailyAppliances(GenericSystemBase system)
+        {
+            if (!system.HasSingleton<SDailyAppliances>())
+            {
+                var entity = system.EntityManager.CreateEntity();
+                system.EntityManager.AddComponentData(entity, new SDailyAppliances());
+                system.EntityManager.AddBuffer<SDailyApplianceId>(entity);
+            }
+
+            var dailyAppliancesEntity = system.GetSingletonEntity<SDailyAppliances>();
+            return system.EntityManager.GetBuffer<SDailyApplianceId>(dailyAppliancesEntity);
+        }
     }
 }
