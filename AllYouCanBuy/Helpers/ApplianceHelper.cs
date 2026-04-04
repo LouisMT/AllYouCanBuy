@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AllYouCanBuy.Components;
@@ -58,14 +57,12 @@ namespace AllYouCanBuy.Helpers
 
         public static int[] CycleApplianceIds(GenericSystemBase system, int count)
         {
-            var dailyAppliancesEntity = system.GetSingletonEntity<SDailyAppliances>();
-            var dailyApplianceIdBuffer = system.EntityManager.GetBuffer<SDailyApplianceId>(dailyAppliancesEntity)
-                .ToNativeArray(Allocator.Temp);
+            var dailyApplianceIds = GetDailyAppliances(system)
+                .ToNativeArray(Allocator.Temp)
+                .Select(s => s.Value);
 
             var allApplianceIds = BaseApplianceIds
-                .Concat(dailyApplianceIdBuffer
-                    .Select(s => s.Value)
-                )
+                .Concat(dailyApplianceIds)
                 .Distinct()
                 .ToArray();
 
@@ -90,11 +87,6 @@ namespace AllYouCanBuy.Helpers
 
         public static void SetDailyApplianceIds(GenericSystemBase system, IEnumerable<int> dailyApplianceIds)
         {
-            if (system is null)
-            {
-                throw new InvalidOperationException("InitialiseApplianceHelper must be called first");
-            }
-
             var dailyApplianceIdBuffer = GetDailyAppliances(system);
 
             dailyApplianceIdBuffer.Clear();
