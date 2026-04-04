@@ -11,28 +11,28 @@
 
     <ItemGroup>
         <Reference Include="Kitchen.Common">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Kitchen.Common.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.Common.dll</HintPath>
         </Reference>
         <Reference Include="Kitchen.GameData">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Kitchen.GameData.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.GameData.dll</HintPath>
         </Reference>
         <Reference Include="Kitchen.RestaurantMode">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Kitchen.RestaurantMode.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.RestaurantMode.dll</HintPath>
         </Reference>
         <Reference Include="KitchenMode">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\KitchenMode.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/KitchenMode.dll</HintPath>
         </Reference>
         <Reference Include="KitchenMods">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\KitchenMods.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/KitchenMods.dll</HintPath>
         </Reference>
         <Reference Include="Unity.Collections">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Unity.Collections.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Unity.Collections.dll</HintPath>
         </Reference>
         <Reference Include="Unity.Entities">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\Unity.Entities.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Unity.Entities.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-            <HintPath>$(PlateUpGamePath)\PlateUp_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
         </Reference>
     </ItemGroup>
 

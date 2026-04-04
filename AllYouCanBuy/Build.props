@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <PlateUpGamePath>[REPLACE]/Steam/steamapps/common/PlateUp/PlateUp/</PlateUpGamePath>
+        <PlateUpGamePath>[REPLACE]/Steam/steamapps/common/PlateUp/PlateUp</PlateUpGamePath>
         <AutoCopyMod>false</AutoCopyMod>
     </PropertyGroup>
 </Project>
