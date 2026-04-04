@@ -4,7 +4,6 @@
     branches:
       - main
   release:
-  workflow_dispatch:
 
 jobs:
   build:
@@ -20,23 +19,24 @@ jobs:
         uses: actions/cache@v5
         with:
           path: PlateUp/**/*.dll
-          key: dependencies
+          key: dependencies-${{ hashFiles('game-version.json') }}
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
       - name: Install SteamCMD
-        if: steps.cache-dependencies.outputs.cache-hit != 'true' || forgejo.event_name == 'workflow_dispatch'
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: &install_steamcmd_run |
           apt-get update
           apt-get install -y lib32gcc-s1
           mkdir steamcmd
           curl -fL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar -xz -C steamcmd
       - name: Download dependencies
-        if: steps.cache-dependencies.outputs.cache-hit != 'true' || forgejo.event_name == 'workflow_dispatch'
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         env:
           STEAM_USERNAME: ${{ secrets.STEAM_USERNAME }}
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
         run: |
           ./steamcmd/steamcmd.sh +login "$STEAM_USERNAME" "$STEAM_PASSWORD" +app_update 1599600 +quit
+          # We can't use `+force_install_dir`, because that will cause SteamCMD to segfault.
           mv /root/Steam/steamapps/common/PlateUp PlateUp
       - name: Lint
         run: dotnet format --verify-no-changes
