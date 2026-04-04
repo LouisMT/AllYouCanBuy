@@ -70,5 +70,6 @@ jobs:
           STEAM_PASSWORD: ${{ secrets.STEAM_PASSWORD }}
         run: |
           sed -i "s|REPLACE_CONTENTFOLDER|$(pwd)/workshop/content|g" workshop/AllYouCanBuy.vdf
+          sed -i "s|REPLACE_PREVIEWFILE|$(pwd)/workshop/preview.png|g" workshop/AllYouCanBuy.vdf
           sed -i "s|REPLACE_CHANGENOTE|Version ${{ forgejo.ref_name }}|g" workshop/AllYouCanBuy.vdf
           ./steamcmd/steamcmd.sh +login "$STEAM_USERNAME" "$STEAM_PASSWORD" +workshop_build_item "$(pwd)/workshop/AllYouCanBuy.vdf" +quit
