@@ -71,7 +71,7 @@ namespace AllYouCanBuy.Helpers
 
             var result = new int[count];
             var currentApplianceIndex = GetCurrentApplianceIndex(system);
-            Debug.Log($"Cycling {count} appliance IDs, starting at {currentApplianceIndex}");
+            Debug.Log($"Cycling {count} appliance IDs, starting at {currentApplianceIndex} ({allApplianceIds.Length} unique appliances available)");
 
             for (var i = 0; i < count; i++)
             {
