@@ -61,7 +61,7 @@ namespace AllYouCanBuy.Helpers
             var dailyAppliancesEntity = system.GetSingletonEntity<SDailyAppliances>();
             var dailyApplianceIdBuffer = system.EntityManager.GetBuffer<SDailyApplianceId>(dailyAppliancesEntity)
                 .ToNativeArray(Allocator.Temp);
-            
+
             var allApplianceIds = BaseApplianceIds
                 .Concat(dailyApplianceIdBuffer
                     .Select(s => s.Value)
@@ -79,7 +79,7 @@ namespace AllYouCanBuy.Helpers
                 {
                     currentApplianceIndex = 0;
                 }
-                
+
                 result[i] = allApplianceIds[currentApplianceIndex++];
             }
 

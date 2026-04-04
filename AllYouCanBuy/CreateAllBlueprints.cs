@@ -35,7 +35,7 @@ namespace AllYouCanBuy
             {
                 var freeTile = freeTiles[i];
                 var applianceId = applianceIds[i];
-                
+
                 Debug.Log($"Spawning {applianceId} at {freeTile}");
                 PostHelpers.CreateOpenedLetter(
                     EntityManager,
