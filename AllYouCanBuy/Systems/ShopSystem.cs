@@ -1,7 +1,7 @@
-﻿using Kitchen;
+using Kitchen;
 using Unity.Entities;
 
-namespace AllYouCanBuy
+namespace AllYouCanBuy.Systems
 {
     /**
      * Runs when:

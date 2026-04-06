@@ -2,7 +2,7 @@
 using KitchenMods;
 using Unity.Entities;
 
-namespace AllYouCanBuy
+namespace AllYouCanBuy.Systems
 {
     [UpdateInGroup(typeof(EndOfDayProgressionGroup))]
     [UpdateAfter(typeof(HandleNewShop))]

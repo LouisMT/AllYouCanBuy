@@ -5,7 +5,6 @@ using AllYouCanBuy.Constants;
 using Kitchen;
 using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 
 namespace AllYouCanBuy.Helpers
 {
@@ -68,7 +67,7 @@ namespace AllYouCanBuy.Helpers
 
             var result = new ApplianceId[count];
             var currentApplianceIndex = GetCurrentApplianceIndex(system);
-            Debug.Log($"Cycling {count} appliance IDs, starting at {currentApplianceIndex} ({allApplianceIds.Length} unique appliances available)");
+            Logger.Info($"Cycling {count} appliance IDs, starting at {currentApplianceIndex} ({allApplianceIds.Length} unique appliances available)");
 
             for (var i = 0; i < count; i++)
             {
