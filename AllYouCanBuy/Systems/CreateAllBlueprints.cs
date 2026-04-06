@@ -7,7 +7,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-namespace AllYouCanBuy
+namespace AllYouCanBuy.Systems
 {
     [UpdateInGroup(typeof(EndOfDayProgressionGroup))]
     public class CreateAllBlueprints : ShopSystem, IModSystem
@@ -23,7 +23,7 @@ namespace AllYouCanBuy
         protected override void OnShopUpdate()
         {
             var freeTiles = FindFreeTiles();
-            Debug.Log($"Found {freeTiles.Count} free tiles");
+            Logger.Info($"Found {freeTiles.Count} free tiles");
 
             var applianceIds = ApplianceHelper.CycleApplianceIds(this, freeTiles.Count);
 
@@ -36,7 +36,7 @@ namespace AllYouCanBuy
                 var freeTile = freeTiles[i];
                 var applianceId = applianceIds[i];
 
-                Debug.Log($"Spawning {applianceId} at {freeTile}");
+                Logger.Info($"Spawning {applianceId} at {freeTile}");
                 PostHelpers.CreateOpenedLetter(
                     EntityManager,
                     freeTile,

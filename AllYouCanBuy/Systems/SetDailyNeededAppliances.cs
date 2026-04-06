@@ -8,7 +8,7 @@ using KitchenMods;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace AllYouCanBuy
+namespace AllYouCanBuy.Systems
 {
     [UpdateInGroup(typeof(EndOfDayProgressionGroup))]
     [UpdateBefore(typeof(CreateAllBlueprints))]

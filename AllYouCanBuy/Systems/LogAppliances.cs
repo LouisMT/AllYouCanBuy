@@ -2,9 +2,8 @@
 using Kitchen;
 using KitchenData;
 using KitchenMods;
-using UnityEngine;
 
-namespace AllYouCanBuy
+namespace AllYouCanBuy.Systems
 {
     public class LogAppliances : GenericSystemBase, IModSystem
     {
@@ -21,7 +20,7 @@ namespace AllYouCanBuy
 
             foreach (var appliance in appliances.Where(a => !string.IsNullOrWhiteSpace(a.Name)))
             {
-                Debug.Log($"Name: {appliance.Name}, ID: {appliance.ID}");
+                Logger.Info($"Name: {appliance.Name}, ID: {appliance.ID}");
             }
 
             _done = true;
