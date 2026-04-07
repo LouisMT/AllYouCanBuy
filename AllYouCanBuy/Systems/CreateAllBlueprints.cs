@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+using AllYouCanBuy.Extensions;
 using AllYouCanBuy.Helpers;
 using Kitchen;
 using KitchenMods;
@@ -36,7 +37,8 @@ namespace AllYouCanBuy.Systems
                 var freeTile = freeTiles[i];
                 var applianceId = applianceIds[i];
 
-                Logger.Info($"Spawning {applianceId} at {freeTile}");
+                Logger.Info($"Spawning {applianceId.ToName()} at {freeTile}");
+
                 PostHelpers.CreateOpenedLetter(
                     EntityManager,
                     freeTile,
