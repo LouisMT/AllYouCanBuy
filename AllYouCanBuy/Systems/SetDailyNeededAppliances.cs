@@ -70,7 +70,7 @@ namespace AllYouCanBuy.Systems
                     .SelectMany(id => id switch
                     {
                         // Add extra appliances based on what's in the shop already.
-                        ApplianceId.Plates => new[] { ApplianceId.Plates, ApplianceId.DishRack },
+                        ApplianceId.Plates => new[] { ApplianceId.Plates, ApplianceId.DishRack, ApplianceId.Sink },
                         ApplianceId.Oven => new[] { ApplianceId.Oven, ApplianceId.Hob },
                         _ => new[] { id }
                     });
