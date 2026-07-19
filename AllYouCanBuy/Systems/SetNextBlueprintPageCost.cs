@@ -12,6 +12,8 @@ namespace AllYouCanBuy.Systems
     [UpdateBefore(typeof(RerollBlueprintView.UpdateRerollBlueprintView))]
     public class SetNextBlueprintPageCost : GameSystemBase, IModSystem
     {
+        internal static int ProgressViewIdentifier { get; private set; }
+
         private int _rerollCost;
         private bool _pagingEnabled;
         private EntityQuery _rerollTriggers;
@@ -26,6 +28,8 @@ namespace AllYouCanBuy.Systems
 
         protected override void OnUpdate()
         {
+            UpdateProgressViewIdentifier();
+
             var isPagingDay = HasSingleton<SDay>() && GetSingleton<SDay>().Day % 5 != 0;
 
             if (isPagingDay && !_pagingEnabled && HasSingleton<SRerollCost>())
@@ -48,6 +52,30 @@ namespace AllYouCanBuy.Systems
 
                 RestoreDuration();
                 _pagingEnabled = false;
+            }
+        }
+
+        private void UpdateProgressViewIdentifier()
+        {
+            using var entities = _rerollTriggers.ToEntityArray(Allocator.Temp);
+            foreach (var entity in entities)
+            {
+                if (!EntityManager.HasComponent<CHasIndicator>(entity))
+                {
+                    continue;
+                }
+
+                var indicator = EntityManager.GetComponentData<CHasIndicator>(entity);
+                if (indicator.IndicatorType != ViewType.ProgressView ||
+                    !EntityManager.HasComponent<CLinkedView>(indicator.Indicator))
+                {
+                    continue;
+                }
+
+                ProgressViewIdentifier = EntityManager
+                    .GetComponentData<CLinkedView>(indicator.Indicator)
+                    .Identifier.Identifier;
+                return;
             }
         }
 

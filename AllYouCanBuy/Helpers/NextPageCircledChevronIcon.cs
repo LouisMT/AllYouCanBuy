@@ -4,28 +4,28 @@ using UnityEngine;
 
 namespace AllYouCanBuy.Helpers
 {
-    internal static class CycleBlueprintArrowsIcon
+    internal static class NextPageCircledChevronIcon
     {
-        private const string ResourceName = "AllYouCanBuy.Assets.CycleBlueprintArrowsIcon.rgba";
+        private const string ResourceName = "AllYouCanBuy.Assets.NextPageCircledChevronIcon.rgba";
         private const float PixelsPerUnit = 25.6f;
 
         internal static Texture2D CreateTexture()
         {
-            using var stream = typeof(CycleBlueprintArrowsIcon).Assembly.GetManifestResourceStream(ResourceName)
+            using var stream = typeof(NextPageCircledChevronIcon).Assembly.GetManifestResourceStream(ResourceName)
                 ?? throw new InvalidOperationException($"Missing embedded icon resource {ResourceName}");
             using var reader = new BinaryReader(stream);
 
             if (reader.ReadByte() != 'A' || reader.ReadByte() != 'Y' ||
                 reader.ReadByte() != 'C' || reader.ReadByte() != 'I')
             {
-                throw new InvalidDataException("Invalid Cycle Blueprints icon header");
+                throw new InvalidDataException("Invalid Next Page circled chevron icon header");
             }
 
             var width = reader.ReadInt32();
             var height = reader.ReadInt32();
             var texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
             {
-                name = "Cycle Blueprint Arrows Icon",
+                name = "Next Page Circled Chevron Icon",
                 filterMode = FilterMode.Bilinear,
                 wrapMode = TextureWrapMode.Clamp
             };
@@ -42,7 +42,7 @@ namespace AllYouCanBuy.Helpers
                 new Vector2(0.5f, 0.5f),
                 PixelsPerUnit
             );
-            sprite.name = "Cycle Blueprint Arrows Icon";
+            sprite.name = "Next Page Circled Chevron Icon";
             return sprite;
         }
     }

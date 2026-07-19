@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AllYouCanBuy.Views
 {
-    public class CycleBlueprintProgressView : MonoBehaviour
+    public class NextBlueprintPageProgressView : MonoBehaviour
     {
         private static readonly FieldInfo? IconField = typeof(ProgressView).GetField(
             "Icon",
@@ -17,13 +17,15 @@ namespace AllYouCanBuy.Views
         private GameObject? _spriteObject;
         private Texture2D? _texture;
         private Sprite? _sprite;
+        private string? _rerollIcon;
         private bool _initialised;
-        private bool _isCycle;
+        private bool _isNextPage;
 
-        internal void UpdateState(ProgressView view, bool isCycle)
+        internal void UpdateState(ProgressView view, bool isNextPage)
         {
-            _isCycle = isCycle;
-            if (!_initialised && _isCycle)
+            var wasNextPage = _isNextPage;
+            _isNextPage = isNextPage;
+            if (!_initialised && _isNextPage)
             {
                 _initialised = true;
                 _icon = IconField?.GetValue(view) as TextMeshPro;
@@ -32,9 +34,10 @@ namespace AllYouCanBuy.Views
                     return;
                 }
 
-                _texture = CycleBlueprintArrowsIcon.CreateTexture();
-                _sprite = CycleBlueprintArrowsIcon.CreateSprite(_texture);
-                _spriteObject = new GameObject("Cycle Blueprint Arrows Icon");
+                _rerollIcon = _icon.text;
+                _texture = NextPageCircledChevronIcon.CreateTexture();
+                _sprite = NextPageCircledChevronIcon.CreateSprite(_texture);
+                _spriteObject = new GameObject("Next Page Circled Chevron Icon");
                 _spriteObject.transform.SetParent(_icon.transform, false);
                 _spriteObject.transform.localScale = Vector3.one * 4f;
 
@@ -49,12 +52,16 @@ namespace AllYouCanBuy.Views
                 }
             }
 
-            _spriteObject?.SetActive(_isCycle);
+            _spriteObject?.SetActive(_isNextPage);
+            if (wasNextPage && !_isNextPage && _icon != null && _rerollIcon != null)
+            {
+                _icon.text = _rerollIcon;
+            }
         }
 
         private void LateUpdate()
         {
-            if (_isCycle && _icon != null)
+            if (_isNextPage && _icon != null)
             {
                 _icon.text = string.Empty;
             }

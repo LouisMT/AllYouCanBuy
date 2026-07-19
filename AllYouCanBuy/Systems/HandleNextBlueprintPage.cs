@@ -7,6 +7,7 @@ using Unity.Entities;
 
 namespace AllYouCanBuy.Systems
 {
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(RerollShopAfterDuration))]
     [UpdateBefore(typeof(HandleShopReroll))]
     [UpdateBefore(typeof(RerollBlueprintView.UpdateRerollBlueprintView))]
@@ -52,6 +53,7 @@ namespace AllYouCanBuy.Systems
                 .ToComponentDataArray<CGrantsShopDiscount>(Allocator.Temp)
                 .Aggregate(1f, (current, discount) => current * (1f - discount.Amount));
 
+            ApplianceHelper.AdvancePage(freeTiles.Count);
             BlueprintPageHelper.Create(this, freeTiles, priceMultiplier);
         }
     }

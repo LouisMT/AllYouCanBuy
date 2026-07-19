@@ -1,43 +1,26 @@
-import math
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
+from mathutils.geometry import tessellate_polygon
 
 
 OUTPUT_DIR = Path(__file__).resolve().parent
-BLEND_PATH = OUTPUT_DIR / "CycleBlueprintArrows.blend"
+BLEND_PATH = OUTPUT_DIR / "NextPageCircledChevron.blend"
 
 
-def arrow_polygon(start_degrees, end_degrees, radius=1.0, width=0.22, head_width=0.42, head_length=0.52):
-    start = math.radians(start_degrees)
-    end = math.radians(end_degrees)
-    steps = 20
-
-    outer = []
-    inner = []
-    for index in range(steps + 1):
-        angle = start + (end - start) * index / steps
-        outer.append(Vector(((radius + width) * math.cos(angle), (radius + width) * math.sin(angle))))
-        inner.append(Vector(((radius - width) * math.cos(angle), (radius - width) * math.sin(angle))))
-
-    radial = Vector((math.cos(end), math.sin(end)))
-    tangent = Vector((-math.sin(end), math.cos(end)))
-    centre = radial * radius
-    head_outer = centre + radial * head_width
-    tip = centre + tangent * head_length
-    head_inner = centre - radial * head_width
-
-    return outer + [head_outer, tip, head_inner] + list(reversed(inner))
-
-
-def create_extruded_polygon(name, points, thickness=0.30):
+def create_extruded_polygon(name, points, thickness):
+    points = list(reversed(points))
     count = len(points)
     half = thickness / 2
     vertices = [(point.x, point.y, -half) for point in points]
     vertices += [(point.x, point.y, half) for point in points]
 
-    faces = [tuple(reversed(range(count))), tuple(range(count, count * 2))]
+    faces = []
+    for triangle in tessellate_polygon([points]):
+        indices = list(triangle)
+        faces.append(tuple(reversed(indices)))
+        faces.append(tuple(index + count for index in indices))
     for index in range(count):
         next_index = (index + 1) % count
         faces.append((index, next_index, next_index + count, index + count))
@@ -45,19 +28,8 @@ def create_extruded_polygon(name, points, thickness=0.30):
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
-
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
-
-    bevel = obj.modifiers.new("Soft PlateUp Edges", "BEVEL")
-    bevel.width = 0.075
-    bevel.segments = 3
-    bevel.limit_method = "ANGLE"
-
-    bpy.context.view_layer.objects.active = obj
-    obj.select_set(True)
-    bpy.ops.object.modifier_apply(modifier=bevel.name)
-    obj.select_set(False)
     return obj
 
 
@@ -115,24 +87,42 @@ tile_material = make_material(
     roughness=0.52,
 )
 
-arrow_a = create_extruded_polygon("Cycle Arrow A", arrow_polygon(-20, 100))
-arrow_b = create_extruded_polygon("Cycle Arrow B", arrow_polygon(160, 280))
-arrow_a.data.materials.append(glow)
-arrow_b.data.materials.append(glow)
-
-bpy.ops.object.select_all(action="DESELECT")
-arrow_a.select_set(True)
-arrow_b.select_set(True)
-bpy.context.view_layer.objects.active = arrow_a
-bpy.ops.object.join()
+bpy.ops.mesh.primitive_cylinder_add(vertices=96, radius=1.25, depth=0.30)
 icon = bpy.context.object
-icon.name = "CycleBlueprintArrows"
-icon.data.name = "CycleBlueprintArrows"
-icon.scale.x = -1
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-icon["design"] = "Two curved arrows for the Cycle Blueprints PlateUp tile"
-icon["intended_material"] = "Glowing Blue Soft"
-icon["mirrored_for_original_spin"] = True
+icon.name = "NextPageCircledChevron"
+icon.data.name = "NextPageCircledChevron"
+icon.data.materials.append(glow)
+
+cutter = create_extruded_polygon(
+    "Chevron Cutout",
+    [
+        Vector((-0.43, 0.57)),
+        Vector((-0.17, 0.83)),
+        Vector((0.69, 0.0)),
+        Vector((-0.17, -0.83)),
+        Vector((-0.43, -0.57)),
+        Vector((0.16, 0.0)),
+    ],
+    thickness=0.80,
+)
+boolean = icon.modifiers.new("Inset Chevron", "BOOLEAN")
+boolean.operation = "DIFFERENCE"
+boolean.solver = "EXACT"
+boolean.object = cutter
+bpy.context.view_layer.objects.active = icon
+bpy.ops.object.modifier_apply(modifier=boolean.name)
+bpy.data.objects.remove(cutter, do_unlink=True)
+
+bevel = icon.modifiers.new("Soft PlateUp Edges", "BEVEL")
+bevel.width = 0.055
+bevel.segments = 3
+bevel.limit_method = "ANGLE"
+bpy.context.view_layer.objects.active = icon
+bpy.ops.object.modifier_apply(modifier=bevel.name)
+
+icon["design"] = "Right-facing circled chevron for the Next Page PlateUp tile"
+icon["intended_material"] = "Inherited from the reroll dice"
+icon["floor_alignment"] = "Blender XY plane maps to Unity XZ plane"
 
 tile = add_beveled_cube(
     "Preview Tile Base",

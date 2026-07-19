@@ -1,4 +1,5 @@
 using AllYouCanBuy.Components;
+using AllYouCanBuy.Helpers;
 using Kitchen;
 using KitchenMods;
 
@@ -21,6 +22,7 @@ namespace AllYouCanBuy.Systems
         public override void AfterLoading(SaveSystemType systemType)
         {
             base.AfterLoading(systemType);
+            ApplianceHelper.Reset();
 #pragma warning disable CS0618 // Type or member is obsolete
             EntityManager.DestroyEntity(GetEntityQuery(typeof(SDailyAppliances)));
             EntityManager.DestroyEntity(GetEntityQuery(typeof(SCurrentApplianceIndex)));

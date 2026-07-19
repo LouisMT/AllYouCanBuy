@@ -10,8 +10,8 @@
             Condition="Exists('Build.local.props')"/>
 
     <ItemGroup>
-        <EmbeddedResource Include="Assets/CycleBlueprintArrows.mesh"/>
-        <EmbeddedResource Include="Assets/CycleBlueprintArrowsIcon.rgba"/>
+        <EmbeddedResource Include="Assets/NextPageCircledChevron.mesh"/>
+        <EmbeddedResource Include="Assets/NextPageCircledChevronIcon.rgba"/>
 
         <Reference Include="Kitchen.Common">
             <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.Common.dll</HintPath>

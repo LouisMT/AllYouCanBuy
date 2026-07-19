@@ -4,20 +4,20 @@ using UnityEngine;
 
 namespace AllYouCanBuy.Helpers
 {
-    internal static class CycleBlueprintArrowsMesh
+    internal static class NextPageCircledChevronMesh
     {
-        private const string ResourceName = "AllYouCanBuy.Assets.CycleBlueprintArrows.mesh";
+        private const string ResourceName = "AllYouCanBuy.Assets.NextPageCircledChevron.mesh";
 
         internal static Mesh Create()
         {
-            using var stream = typeof(CycleBlueprintArrowsMesh).Assembly.GetManifestResourceStream(ResourceName)
+            using var stream = typeof(NextPageCircledChevronMesh).Assembly.GetManifestResourceStream(ResourceName)
                 ?? throw new InvalidOperationException($"Missing embedded mesh resource {ResourceName}");
             using var reader = new BinaryReader(stream);
 
             if (reader.ReadByte() != 'A' || reader.ReadByte() != 'Y' ||
                 reader.ReadByte() != 'C' || reader.ReadByte() != 'B')
             {
-                throw new InvalidDataException("Invalid Cycle Blueprints mesh header");
+                throw new InvalidDataException("Invalid Next Page circled chevron mesh header");
             }
 
             var vertexCount = reader.ReadInt32();
@@ -34,7 +34,7 @@ namespace AllYouCanBuy.Helpers
 
             var mesh = new Mesh
             {
-                name = "Cycle Blueprint Arrows",
+                name = "Next Page Circled Chevron",
                 vertices = vertices,
                 normals = normals,
                 triangles = triangles

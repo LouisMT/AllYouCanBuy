@@ -1,13 +1,15 @@
 using System.Reflection;
+using AllYouCanBuy.Systems;
 using AllYouCanBuy.Views;
 using Kitchen;
 using KitchenMods;
 using TMPro;
+using Unity.Entities;
 using UnityEngine;
 
 namespace AllYouCanBuy.Helpers
 {
-    public class CycleBlueprintViewManager : IModInitializer
+    public class NextBlueprintPageViewManager : IModInitializer
     {
         private static GameObject? _manager;
 
@@ -28,20 +30,17 @@ namespace AllYouCanBuy.Helpers
 
             _manager = new GameObject("All You Can Buy View Manager");
             Object.DontDestroyOnLoad(_manager);
-            _manager.AddComponent<CycleBlueprintViewManagerBehaviour>();
+            _manager.AddComponent<NextBlueprintPageViewManagerBehaviour>();
         }
     }
 
-    public class CycleBlueprintViewManagerBehaviour : MonoBehaviour
+    public class NextBlueprintPageViewManagerBehaviour : MonoBehaviour
     {
         private const float UpdateInterval = 0.1f;
-        private const float ProgressViewRangeSquared = 4f;
-
         private static readonly FieldInfo? TitleField = typeof(RerollBlueprintView).GetField(
             "Title",
             BindingFlags.Instance | BindingFlags.NonPublic
         );
-
         private float _nextUpdateTime;
 
         private void Update()
@@ -53,29 +52,30 @@ namespace AllYouCanBuy.Helpers
 
             _nextUpdateTime = Time.unscaledTime + UpdateInterval;
             var rerollViews = Object.FindObjectsOfType<RerollBlueprintView>();
-            var hasCycleView = false;
+            var hasNextPageView = false;
 
             foreach (var rerollView in rerollViews)
             {
                 var title = TitleField?.GetValue(rerollView) as TextMeshPro;
                 var titleText = title?.text ?? string.Empty;
-                var cycleView = rerollView.GetComponent<NextBlueprintPageView>();
+                var nextPageView = rerollView.GetComponent<NextBlueprintPageView>();
                 var hasZeroPrice = GetHasZeroPrice(titleText);
-                var isCycle = hasZeroPrice ?? (cycleView?.IsCycle == true);
+                var hasPageTitle = nextPageView?.IsNextPage == true && NextBlueprintPageView.IsPageTitle(titleText);
+                var isNextPage = hasPageTitle || (hasZeroPrice ?? (nextPageView?.IsNextPage == true));
 
-                if (isCycle && cycleView == null)
+                if (isNextPage && nextPageView == null)
                 {
-                    cycleView = rerollView.gameObject.AddComponent<NextBlueprintPageView>();
+                    nextPageView = rerollView.gameObject.AddComponent<NextBlueprintPageView>();
                 }
 
-                cycleView?.UpdateState(rerollView, isCycle);
-                hasCycleView |= isCycle;
+                nextPageView?.UpdateState(rerollView, isNextPage);
+                hasNextPageView |= isNextPage;
             }
 
-            UpdateProgressViews(rerollViews, hasCycleView);
+            UpdateProgressViews(hasNextPageView);
         }
 
-        private static bool? GetHasZeroPrice(string title)
+        internal static bool? GetHasZeroPrice(string title)
         {
             var lineBreak = title.LastIndexOf('\n');
             if (lineBreak < 0)
@@ -107,33 +107,38 @@ namespace AllYouCanBuy.Helpers
             return null;
         }
 
-        private static void UpdateProgressViews(RerollBlueprintView[] rerollViews, bool hasCycleView)
+        private static void UpdateProgressViews(bool hasNextPageView)
         {
+            var targetView = GetNextPageProgressView();
             foreach (var progressView in Object.FindObjectsOfType<ProgressView>())
             {
-                var isCycle = hasCycleView && IsNearRerollView(progressView.transform.position, rerollViews);
-                var cycleView = progressView.GetComponent<CycleBlueprintProgressView>();
+                var isNextPage = hasNextPageView && progressView == targetView;
+                var nextPageView = progressView.GetComponent<NextBlueprintPageProgressView>();
 
-                if (isCycle && cycleView == null)
+                if (isNextPage && nextPageView == null)
                 {
-                    cycleView = progressView.gameObject.AddComponent<CycleBlueprintProgressView>();
+                    nextPageView = progressView.gameObject.AddComponent<NextBlueprintPageProgressView>();
                 }
 
-                cycleView?.UpdateState(progressView, isCycle);
+                nextPageView?.UpdateState(progressView, isNextPage);
             }
         }
 
-        private static bool IsNearRerollView(Vector3 position, RerollBlueprintView[] rerollViews)
+        private static ProgressView? GetNextPageProgressView()
         {
-            foreach (var rerollView in rerollViews)
+            var identifier = SetNextBlueprintPageCost.ProgressViewIdentifier;
+            var viewManager = World.DefaultGameObjectInjectionWorld?
+                .GetExistingSystem<EntityViewManager>();
+            if (identifier == 0 || viewManager == null ||
+                !viewManager.EntityViews.TryGetValue(
+                    new ViewIdentifier { Identifier = identifier },
+                    out var view
+                ))
             {
-                if ((rerollView.transform.position - position).sqrMagnitude <= ProgressViewRangeSquared)
-                {
-                    return true;
-                }
+                return null;
             }
 
-            return false;
+            return view as ProgressView;
         }
     }
 }

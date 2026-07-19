@@ -6,7 +6,7 @@ import bpy
 
 
 OUTPUT_PATH = Path(sys.argv[-1]).resolve()
-OBJECT_NAME = "CycleBlueprintArrows"
+OBJECT_NAME = "NextPageCircledChevron"
 
 obj = bpy.data.objects[OBJECT_NAME]
 mesh = obj.data
