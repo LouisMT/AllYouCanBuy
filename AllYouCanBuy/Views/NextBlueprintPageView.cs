@@ -1,6 +1,7 @@
 using System.Reflection;
 using AllYouCanBuy.Helpers;
 using Kitchen;
+using KitchenData;
 using TMPro;
 using UnityEngine;
 
@@ -14,29 +15,79 @@ namespace AllYouCanBuy.Views
             "Title",
             BindingFlags.Instance | BindingFlags.NonPublic
         );
+        private static string? _rerollLabel;
 
         private TextMeshPro? _title;
         private GameObject? _dice;
         private GameObject? _secondDice;
         private GameObject? _icon;
         private Mesh? _iconMesh;
+        private bool _initialised;
+        private bool _isCycle;
 
-        public void Initialise(RerollBlueprintView view)
+        internal bool IsCycle => _isCycle;
+
+        internal void UpdateState(RerollBlueprintView view, bool isCycle)
         {
-            _title = TitleField?.GetValue(view) as TextMeshPro;
-            ReplaceDice(view.transform);
+            _isCycle = isCycle;
+            if (!_initialised && _isCycle)
+            {
+                _initialised = true;
+                _title = TitleField?.GetValue(view) as TextMeshPro;
+                ReplaceDice(view.transform);
+            }
+
+            UpdatePromptLabel();
+            _dice?.SetActive(!_isCycle);
+            _secondDice?.SetActive(!_isCycle);
+            _icon?.SetActive(_isCycle);
+        }
+
+        private void UpdatePromptLabel()
+        {
+            var localisation = GameData.Main?.GlobalLocalisation;
+            if (localisation?.Text == null || !localisation.Text.TryGetValue("LABEL_REROLL", out var currentLabel))
+            {
+                return;
+            }
+
+            if (_isCycle && currentLabel != Label)
+            {
+                _rerollLabel = currentLabel;
+                localisation.Text["LABEL_REROLL"] = Label;
+            }
+            else if (!_isCycle && _rerollLabel != null && currentLabel == Label)
+            {
+                localisation.Text["LABEL_REROLL"] = _rerollLabel;
+                if (_title != null)
+                {
+                    var lineBreak = _title.text.IndexOf('\n');
+                    var priceLine = lineBreak >= 0
+                        ? _title.text.Substring(lineBreak)
+                        : string.Empty;
+                    _title.text = _rerollLabel + priceLine;
+                }
+            }
         }
 
         private void LateUpdate()
         {
-            if (_title != null)
+            if (!_isCycle || _title == null)
             {
-                _title.text = Label;
+                return;
             }
+
+            _title.text = Label;
         }
 
         private void OnDestroy()
         {
+            if (_isCycle)
+            {
+                _isCycle = false;
+                UpdatePromptLabel();
+            }
+
             if (_dice != null)
             {
                 _dice.SetActive(true);
