@@ -75,7 +75,7 @@ namespace AllYouCanBuy.Systems
                         _ => new[] { id }
                     });
 
-            ApplianceHelper.SetDailyApplianceIds(this, dailyApplianceIds);
+            ApplianceHelper.SetDailyApplianceIds(dailyApplianceIds);
         }
     }
 

@@ -19,6 +19,9 @@
         <Reference Include="Kitchen.GameData">
             <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.GameData.dll</HintPath>
         </Reference>
+        <Reference Include="Kitchen.Persistence">
+            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.Persistence.dll</HintPath>
+        </Reference>
         <Reference Include="Kitchen.RestaurantMode">
             <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.RestaurantMode.dll</HintPath>
         </Reference>

@@ -36,7 +36,7 @@ namespace AllYouCanBuy.Helpers
         internal static void Create(GenericSystemBase system, IReadOnlyList<Vector3> freeTiles, float priceMultiplier)
         {
             Logger.Info($"Found {freeTiles.Count} free tiles");
-            var applianceIds = ApplianceHelper.CycleApplianceIds(system, freeTiles.Count);
+            var applianceIds = ApplianceHelper.CycleApplianceIds(freeTiles.Count);
 
             for (var i = 0; i < freeTiles.Count; i++)
             {
