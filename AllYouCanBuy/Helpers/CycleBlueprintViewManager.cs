@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Reflection;
 using AllYouCanBuy.Views;
 using Kitchen;
@@ -30,7 +29,6 @@ namespace AllYouCanBuy.Helpers
             _manager = new GameObject("All You Can Buy View Manager");
             Object.DontDestroyOnLoad(_manager);
             _manager.AddComponent<CycleBlueprintViewManagerBehaviour>();
-            Logger.Info("[CycleBlueprintViewManager] Runtime view manager installed after world injection");
         }
     }
 
@@ -44,24 +42,10 @@ namespace AllYouCanBuy.Helpers
             BindingFlags.Instance | BindingFlags.NonPublic
         );
 
-        private readonly Dictionary<int, string> _lastTitles = new Dictionary<int, string>();
         private float _nextUpdateTime;
-        private bool _loggedFirstUpdate;
-        private int _lastRerollViewCount = -1;
-
-        private void Awake()
-        {
-            Logger.Info("[CycleBlueprintViewManager] Runtime behaviour awake");
-        }
 
         private void Update()
         {
-            if (!_loggedFirstUpdate)
-            {
-                _loggedFirstUpdate = true;
-                Logger.Info("[CycleBlueprintViewManager] Runtime behaviour received its first update");
-            }
-
             if (Time.unscaledTime < _nextUpdateTime)
             {
                 return;
@@ -71,12 +55,6 @@ namespace AllYouCanBuy.Helpers
             var rerollViews = Object.FindObjectsOfType<RerollBlueprintView>();
             var hasCycleView = false;
 
-            if (rerollViews.Length != _lastRerollViewCount)
-            {
-                _lastRerollViewCount = rerollViews.Length;
-                Logger.Info($"[CycleBlueprintViewManager] Found {rerollViews.Length} reroll views");
-            }
-
             foreach (var rerollView in rerollViews)
             {
                 var title = TitleField?.GetValue(rerollView) as TextMeshPro;
@@ -84,22 +62,10 @@ namespace AllYouCanBuy.Helpers
                 var cycleView = rerollView.GetComponent<NextBlueprintPageView>();
                 var hasZeroPrice = GetHasZeroPrice(titleText);
                 var isCycle = hasZeroPrice ?? (cycleView?.IsCycle == true);
-                var viewId = rerollView.GetInstanceID();
-
-                if (!_lastTitles.TryGetValue(viewId, out var previousTitle) || previousTitle != titleText)
-                {
-                    _lastTitles[viewId] = titleText;
-                    Logger.Info(
-                        $"[CycleBlueprintViewManager] Reroll title=\"{titleText.Replace("\n", "\\n")}\"; " +
-                        $"zeroPrice={hasZeroPrice?.ToString() ?? "<hidden>"}; isCycle={isCycle}; " +
-                        $"titleFieldFound={title != null}"
-                    );
-                }
 
                 if (isCycle && cycleView == null)
                 {
                     cycleView = rerollView.gameObject.AddComponent<NextBlueprintPageView>();
-                    Logger.Info($"[CycleBlueprintViewManager] Detected free reroll view {rerollView.name}; enabling cycle visuals");
                 }
 
                 cycleView?.UpdateState(rerollView, isCycle);
@@ -151,7 +117,6 @@ namespace AllYouCanBuy.Helpers
                 if (isCycle && cycleView == null)
                 {
                     cycleView = progressView.gameObject.AddComponent<CycleBlueprintProgressView>();
-                    Logger.Info($"[CycleBlueprintViewManager] Detected cycle progress view {progressView.name}");
                 }
 
                 cycleView?.UpdateState(progressView, isCycle);
