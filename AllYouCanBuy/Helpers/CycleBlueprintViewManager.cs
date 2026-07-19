@@ -10,12 +10,10 @@ namespace AllYouCanBuy.Helpers
 {
     public class CycleBlueprintViewManager : IModInitializer
     {
+        private static GameObject? _manager;
+
         public void PostActivate(Mod mod)
         {
-            var manager = new GameObject("All You Can Buy View Manager");
-            Object.DontDestroyOnLoad(manager);
-            manager.AddComponent<CycleBlueprintViewManagerBehaviour>();
-            Logger.Info("[CycleBlueprintViewManager] Runtime view manager installed");
         }
 
         public void PreInject()
@@ -24,6 +22,15 @@ namespace AllYouCanBuy.Helpers
 
         public void PostInject()
         {
+            if (_manager != null)
+            {
+                return;
+            }
+
+            _manager = new GameObject("All You Can Buy View Manager");
+            Object.DontDestroyOnLoad(_manager);
+            _manager.AddComponent<CycleBlueprintViewManagerBehaviour>();
+            Logger.Info("[CycleBlueprintViewManager] Runtime view manager installed after world injection");
         }
     }
 
@@ -39,10 +46,22 @@ namespace AllYouCanBuy.Helpers
 
         private readonly Dictionary<int, string> _lastTitles = new Dictionary<int, string>();
         private float _nextUpdateTime;
+        private bool _loggedFirstUpdate;
         private int _lastRerollViewCount = -1;
+
+        private void Awake()
+        {
+            Logger.Info("[CycleBlueprintViewManager] Runtime behaviour awake");
+        }
 
         private void Update()
         {
+            if (!_loggedFirstUpdate)
+            {
+                _loggedFirstUpdate = true;
+                Logger.Info("[CycleBlueprintViewManager] Runtime behaviour received its first update");
+            }
+
             if (Time.unscaledTime < _nextUpdateTime)
             {
                 return;
