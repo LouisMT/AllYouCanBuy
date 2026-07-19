@@ -31,12 +31,6 @@
         <Reference Include="KitchenMods">
             <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/KitchenMods.dll</HintPath>
         </Reference>
-        <Reference Include="Kitchen.Networking">
-            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Kitchen.Networking.dll</HintPath>
-        </Reference>
-        <Reference Include="MessagePack.Annotations">
-            <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/MessagePack.Annotations.dll</HintPath>
-        </Reference>
         <Reference Include="Unity.Collections">
             <HintPath>$(PlateUpGamePath)/PlateUp_Data/Managed/Unity.Collections.dll</HintPath>
         </Reference>

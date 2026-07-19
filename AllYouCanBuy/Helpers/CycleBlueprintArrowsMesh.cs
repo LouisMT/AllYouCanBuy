@@ -10,7 +10,6 @@ namespace AllYouCanBuy.Helpers
 
         internal static Mesh Create()
         {
-            CycleBlueprintClientLog.Info($"Opening embedded mesh resource {ResourceName}");
             using var stream = typeof(CycleBlueprintArrowsMesh).Assembly.GetManifestResourceStream(ResourceName)
                 ?? throw new InvalidOperationException($"Missing embedded mesh resource {ResourceName}");
             using var reader = new BinaryReader(stream);
@@ -22,7 +21,6 @@ namespace AllYouCanBuy.Helpers
             }
 
             var vertexCount = reader.ReadInt32();
-            CycleBlueprintClientLog.Info($"Reading cycle mesh resource; bytes={stream.Length}; vertices={vertexCount}");
             var vertices = new Vector3[vertexCount];
             var normals = new Vector3[vertexCount];
             var triangles = new int[vertexCount];
@@ -42,7 +40,6 @@ namespace AllYouCanBuy.Helpers
                 triangles = triangles
             };
             mesh.RecalculateBounds();
-            CycleBlueprintClientLog.Info($"Cycle mesh resource loaded; bounds={mesh.bounds}");
             return mesh;
         }
     }

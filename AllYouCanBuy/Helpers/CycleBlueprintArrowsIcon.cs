@@ -11,7 +11,6 @@ namespace AllYouCanBuy.Helpers
 
         internal static Texture2D CreateTexture()
         {
-            CycleBlueprintClientLog.Info($"Opening embedded icon resource {ResourceName}");
             using var stream = typeof(CycleBlueprintArrowsIcon).Assembly.GetManifestResourceStream(ResourceName)
                 ?? throw new InvalidOperationException($"Missing embedded icon resource {ResourceName}");
             using var reader = new BinaryReader(stream);
@@ -24,7 +23,6 @@ namespace AllYouCanBuy.Helpers
 
             var width = reader.ReadInt32();
             var height = reader.ReadInt32();
-            CycleBlueprintClientLog.Info($"Reading cycle icon resource; bytes={stream.Length}; size={width}x{height}");
             var texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
             {
                 name = "Cycle Blueprint Arrows Icon",
@@ -33,15 +31,11 @@ namespace AllYouCanBuy.Helpers
             };
             texture.LoadRawTextureData(reader.ReadBytes(width * height * 4));
             texture.Apply(false, true);
-            CycleBlueprintClientLog.Info("Cycle icon texture loaded and made non-readable");
             return texture;
         }
 
         internal static Sprite CreateSprite(Texture2D texture)
         {
-            CycleBlueprintClientLog.Info(
-                $"Creating cycle icon sprite from texture={texture.width}x{texture.height}; pixelsPerUnit={PixelsPerUnit}"
-            );
             var sprite = Sprite.Create(
                 texture,
                 new Rect(0f, 0f, texture.width, texture.height),
