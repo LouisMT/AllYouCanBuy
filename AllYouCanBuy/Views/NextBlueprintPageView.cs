@@ -1,12 +1,14 @@
+using System;
 using System.Reflection;
 using AllYouCanBuy.Helpers;
 using Kitchen;
+using MessagePack;
 using TMPro;
 using UnityEngine;
 
 namespace AllYouCanBuy.Views
 {
-    public class NextBlueprintPageView : MonoBehaviour
+    public class NextBlueprintPageView : UpdatableObjectView<NextBlueprintPageView.ViewData>
     {
         public const string Label = "Cycle Blueprints";
 
@@ -20,22 +22,39 @@ namespace AllYouCanBuy.Views
         private GameObject? _secondDice;
         private GameObject? _icon;
         private Mesh? _iconMesh;
+        private bool _initialised;
+        private bool _isCycle;
 
-        public void Initialise(RerollBlueprintView view)
+        protected override void UpdateData(ViewData data)
         {
-            _title = TitleField?.GetValue(view) as TextMeshPro;
-            ReplaceDice(view.transform);
+            _isCycle = data.IsCycle;
+            if (!_isCycle && !_initialised)
+            {
+                return;
+            }
+
+            if (!_initialised)
+            {
+                _initialised = true;
+                var view = GetComponent<RerollBlueprintView>();
+                _title = TitleField?.GetValue(view) as TextMeshPro;
+                ReplaceDice(view.transform);
+            }
+
+            _dice?.SetActive(!_isCycle);
+            _secondDice?.SetActive(!_isCycle);
+            _icon?.SetActive(_isCycle);
         }
 
         private void LateUpdate()
         {
-            if (_title != null)
+            if (_isCycle && _title != null)
             {
                 _title.text = Label;
             }
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             if (_dice != null)
             {
@@ -56,6 +75,8 @@ namespace AllYouCanBuy.Views
             {
                 Destroy(_iconMesh);
             }
+
+            base.OnDestroy();
         }
 
         private void ReplaceDice(Transform start)
@@ -100,6 +121,29 @@ namespace AllYouCanBuy.Views
             }
 
             return null;
+        }
+
+        [Serializable, MessagePackObject(false)]
+        public struct ViewData : ISpecificViewData, IViewData.ICheckForChanges<ViewData>
+        {
+            [Key(0)] public bool IsCycle;
+
+            public IUpdatableObject GetRelevantSubview(IObjectView view)
+            {
+                var rerollView = (view as Component)?.GetComponentInChildren<RerollBlueprintView>(true);
+                if (rerollView == null)
+                {
+                    return null!;
+                }
+
+                return rerollView.GetComponent<NextBlueprintPageView>()
+                       ?? rerollView.gameObject.AddComponent<NextBlueprintPageView>();
+            }
+
+            public bool IsChangedFrom(ViewData check)
+            {
+                return IsCycle != check.IsCycle;
+            }
         }
     }
 }
