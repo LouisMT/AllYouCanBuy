@@ -19,6 +19,7 @@ Always build this project with `dotnet build AllYouCanBuy/AllYouCanBuy.csproj --
 - Normal reroll days restore the localized reroll label, dice, price, duration, and progress glyph.
 - The old cycle-arrow mesh and icon have been replaced with matching circled-chevron resources and renamed loaders/generation scripts.
 - The progress chevron is matched through the reroll appliance's exact ECS indicator/view identity. Blueprint purchases retain the coin icon.
+- The 3D chevron is baked with a 25-degree camera-facing incline and converts the container animation into rotation around its own inclined vertical diameter. Its edge-on flip keeps it visually right-facing.
 - Runtime pagination resets when entering HQ, loading a save, or installing a new daily appliance list.
 
 ## Verification Performed
@@ -28,6 +29,7 @@ Always build this project with `dotnet build AllYouCanBuy/AllYouCanBuy.csproj --
 - `git diff --check` passes.
 - Searches find no stale cycle-arrow runtime names or removed `CycleApplianceIds` calls.
 - In-game testing confirmed the next-page progress bar uses the chevron while blueprint purchases retain their coin icon.
+- In-game testing confirmed the inclined 3D chevron rotates around its own axis and remains visually right-facing.
 - In-game testing confirmed loaded shops can page successfully.
 
 No multiplayer verification has been performed.
@@ -35,12 +37,6 @@ No multiplayer verification has been performed.
 ## Accepted Load Behavior
 
 Pagination state is intentionally runtime-only. When loading a save that already contains shop blueprints, `CreateAllBlueprints` does not run, so the page count remains uninitialized and the title initially shows only `Next Page`. The first page interaction calculates pagination and the fraction then appears. This behavior has been accepted for now.
-
-## Next Task
-
-The 3D chevron inherits rotation from the animated reroll `Container`, so it can point left. The preferred fix is to keep its position/lifecycle parented to the container while overriding its world rotation in `LateUpdate`: project the active camera's right vector onto the floor and align the chevron's local right axis with it. This should keep the mesh horizontal and visually right-facing despite tile orientation or parent animation.
-
-After changing it, make a Release build, verify deployment, and test both idle and interaction animation states in game.
 
 ## Remaining Risks
 

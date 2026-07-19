@@ -10,10 +10,21 @@ namespace AllYouCanBuy.Views
     public class NextBlueprintPageView : MonoBehaviour
     {
         public const string Label = "Next Page";
+        private const float IconCameraInclineDegrees = 25f;
 
         private static readonly FieldInfo? TitleField = typeof(RerollBlueprintView).GetField(
             "Title",
             BindingFlags.Instance | BindingFlags.NonPublic
+        );
+        private static readonly Vector3 IconFlipAxis = new Vector3(
+            0f,
+            -Mathf.Sin(IconCameraInclineDegrees * Mathf.Deg2Rad),
+            Mathf.Cos(IconCameraInclineDegrees * Mathf.Deg2Rad)
+        );
+        private static readonly Vector3 IconSpinAxis = new Vector3(
+            0f,
+            Mathf.Cos(IconCameraInclineDegrees * Mathf.Deg2Rad),
+            Mathf.Sin(IconCameraInclineDegrees * Mathf.Deg2Rad)
         );
         private static string? _rerollLabel;
 
@@ -22,7 +33,11 @@ namespace AllYouCanBuy.Views
         private GameObject? _secondDice;
         private GameObject? _icon;
         private Mesh? _iconMesh;
+        private Transform? _iconContainer;
+        private Quaternion _iconBaseWorldRotation;
+        private Quaternion _iconContainerBaseRotation;
         private bool _initialised;
+        private bool _isIconFlipped;
         private bool _isNextPage;
 
         internal bool IsNextPage => _isNextPage;
@@ -88,7 +103,13 @@ namespace AllYouCanBuy.Views
 
         private void LateUpdate()
         {
-            if (!_isNextPage || _title == null)
+            if (!_isNextPage)
+            {
+                return;
+            }
+
+            UpdateIconRotation();
+            if (_title == null)
             {
                 return;
             }
@@ -100,6 +121,49 @@ namespace AllYouCanBuy.Views
             }
 
             _title.text = GetPageTitle();
+        }
+
+        private void UpdateIconRotation()
+        {
+            var camera = Camera.main;
+            if (_icon == null || _iconContainer == null || camera == null)
+            {
+                return;
+            }
+
+            var containerRotation = Quaternion.Inverse(_iconContainerBaseRotation) *
+                _iconContainer.rotation;
+            var containerForward = containerRotation * Vector3.forward;
+            var spinDegrees = Mathf.Atan2(containerForward.x, containerForward.z) *
+                Mathf.Rad2Deg;
+            ApplyIconRotation(spinDegrees);
+
+            var screenDirection = Vector3.Dot(
+                _icon.transform.TransformDirection(Vector3.right),
+                camera.transform.right
+            );
+            if (screenDirection >= -0.01f)
+            {
+                return;
+            }
+
+            _isIconFlipped = !_isIconFlipped;
+            ApplyIconRotation(spinDegrees);
+        }
+
+        private void ApplyIconRotation(float spinDegrees)
+        {
+            if (_icon == null)
+            {
+                return;
+            }
+
+            var flip = _isIconFlipped
+                ? Quaternion.AngleAxis(180f, IconFlipAxis)
+                : Quaternion.identity;
+            _icon.transform.rotation = _iconBaseWorldRotation *
+                Quaternion.AngleAxis(spinDegrees, IconSpinAxis) *
+                flip;
         }
 
         private void OnDestroy()
@@ -152,6 +216,9 @@ namespace AllYouCanBuy.Views
             _icon.transform.SetParent(container, false);
             _icon.transform.localPosition = new Vector3(0f, 0.95f, 0f);
             _icon.transform.localScale = Vector3.one * 0.3f;
+            _iconContainer = container;
+            _iconContainerBaseRotation = container.rotation;
+            _iconBaseWorldRotation = _icon.transform.rotation;
             _icon.AddComponent<MeshFilter>().sharedMesh = _iconMesh;
             _icon.AddComponent<MeshRenderer>().sharedMaterial = diceRenderer.sharedMaterials[0];
 

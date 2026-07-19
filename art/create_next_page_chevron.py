@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 import bpy
@@ -7,6 +8,7 @@ from mathutils.geometry import tessellate_polygon
 
 OUTPUT_DIR = Path(__file__).resolve().parent
 BLEND_PATH = OUTPUT_DIR / "NextPageCircledChevron.blend"
+CAMERA_INCLINE_DEGREES = 25
 
 
 def create_extruded_polygon(name, points, thickness):
@@ -120,9 +122,13 @@ bevel.limit_method = "ANGLE"
 bpy.context.view_layer.objects.active = icon
 bpy.ops.object.modifier_apply(modifier=bevel.name)
 
+icon.rotation_euler.x = math.radians(90 + CAMERA_INCLINE_DEGREES)
+bpy.context.view_layer.objects.active = icon
+bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
+
 icon["design"] = "Right-facing circled chevron for the Next Page PlateUp tile"
 icon["intended_material"] = "Inherited from the reroll dice"
-icon["floor_alignment"] = "Blender XY plane maps to Unity XZ plane"
+icon["orientation"] = f"Inclined {CAMERA_INCLINE_DEGREES} degrees toward the PlateUp camera"
 
 tile = add_beveled_cube(
     "Preview Tile Base",
