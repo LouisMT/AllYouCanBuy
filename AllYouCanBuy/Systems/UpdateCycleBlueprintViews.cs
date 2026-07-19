@@ -6,6 +6,7 @@ using Unity.Entities;
 
 namespace AllYouCanBuy.Systems
 {
+    [UpdateInGroup(typeof(ViewSystemsGroup))]
     [UpdateAfter(typeof(RerollBlueprintView.UpdateRerollBlueprintView))]
     [UpdateAfter(typeof(ProgressView.UpdateProgressView))]
     public class UpdateCycleBlueprintViews : ViewSystemBase, IModSystem

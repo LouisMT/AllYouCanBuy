@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using AllYouCanBuy.Helpers;
 using Kitchen;
+using KitchenData;
 using MessagePack;
 using TMPro;
 using UnityEngine;
@@ -16,6 +17,7 @@ namespace AllYouCanBuy.Views
             "Title",
             BindingFlags.Instance | BindingFlags.NonPublic
         );
+        private static string? _rerollLabel;
 
         private TextMeshPro? _title;
         private GameObject? _dice;
@@ -28,6 +30,7 @@ namespace AllYouCanBuy.Views
         protected override void UpdateData(ViewData data)
         {
             _isCycle = data.IsCycle;
+            UpdatePromptLabel();
             if (!_isCycle && !_initialised)
             {
                 return;
@@ -44,6 +47,33 @@ namespace AllYouCanBuy.Views
             _dice?.SetActive(!_isCycle);
             _secondDice?.SetActive(!_isCycle);
             _icon?.SetActive(_isCycle);
+        }
+
+        private void UpdatePromptLabel()
+        {
+            var localisation = GameData.Main?.GlobalLocalisation;
+            if (localisation?.Text == null || !localisation.Text.TryGetValue("LABEL_REROLL", out var currentLabel))
+            {
+                return;
+            }
+
+            if (_isCycle && currentLabel != Label)
+            {
+                _rerollLabel = currentLabel;
+                localisation.Text["LABEL_REROLL"] = Label;
+            }
+            else if (!_isCycle && _rerollLabel != null && currentLabel == Label)
+            {
+                localisation.Text["LABEL_REROLL"] = _rerollLabel;
+                if (_title != null)
+                {
+                    var lineBreak = _title.text.IndexOf('\n');
+                    var priceLine = lineBreak >= 0
+                        ? _title.text.Substring(lineBreak)
+                        : string.Empty;
+                    _title.text = _rerollLabel + priceLine;
+                }
+            }
         }
 
         private void LateUpdate()
