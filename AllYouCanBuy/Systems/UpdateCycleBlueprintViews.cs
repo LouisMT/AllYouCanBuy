@@ -1,4 +1,5 @@
 using AllYouCanBuy.Views;
+using AllYouCanBuy.Helpers;
 using Kitchen;
 using KitchenMods;
 using Unity.Collections;
@@ -13,6 +14,7 @@ namespace AllYouCanBuy.Systems
     {
         private EntityQuery _rerollTiles;
         private EntityQuery _progressIndicators;
+        private bool _loggedClientUpdate;
 
         protected override void Initialise()
         {
@@ -24,6 +26,16 @@ namespace AllYouCanBuy.Systems
         protected override void OnUpdate()
         {
             var isCycle = HasSingleton<SDay>() && GetSingleton<SDay>().Day % 5 != 0;
+
+            if (!_loggedClientUpdate && CycleBlueprintClientLog.IsClient)
+            {
+                _loggedClientUpdate = true;
+                CycleBlueprintClientLog.Info(
+                    $"UpdateCycleBlueprintViews is executing on the client; isCycle={isCycle}; " +
+                    $"rerollEntities={_rerollTiles.CalculateEntityCount()}; " +
+                    $"progressEntities={_progressIndicators.CalculateEntityCount()}"
+                );
+            }
 
             using var rerollViews = _rerollTiles.ToComponentDataArray<CLinkedView>(Allocator.Temp);
             foreach (var rerollView in rerollViews)
