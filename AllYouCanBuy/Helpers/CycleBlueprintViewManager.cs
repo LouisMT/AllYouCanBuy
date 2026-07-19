@@ -81,8 +81,9 @@ namespace AllYouCanBuy.Helpers
             {
                 var title = TitleField?.GetValue(rerollView) as TextMeshPro;
                 var titleText = title?.text ?? string.Empty;
-                var isCycle = HasZeroPrice(titleText);
                 var cycleView = rerollView.GetComponent<NextBlueprintPageView>();
+                var hasZeroPrice = GetHasZeroPrice(titleText);
+                var isCycle = hasZeroPrice ?? (cycleView?.IsCycle == true);
                 var viewId = rerollView.GetInstanceID();
 
                 if (!_lastTitles.TryGetValue(viewId, out var previousTitle) || previousTitle != titleText)
@@ -90,7 +91,8 @@ namespace AllYouCanBuy.Helpers
                     _lastTitles[viewId] = titleText;
                     Logger.Info(
                         $"[CycleBlueprintViewManager] Reroll title=\"{titleText.Replace("\n", "\\n")}\"; " +
-                        $"zeroPrice={isCycle}; titleFieldFound={title != null}"
+                        $"zeroPrice={hasZeroPrice?.ToString() ?? "<hidden>"}; isCycle={isCycle}; " +
+                        $"titleFieldFound={title != null}"
                     );
                 }
 
@@ -107,12 +109,12 @@ namespace AllYouCanBuy.Helpers
             UpdateProgressViews(rerollViews, hasCycleView);
         }
 
-        private static bool HasZeroPrice(string title)
+        private static bool? GetHasZeroPrice(string title)
         {
             var lineBreak = title.LastIndexOf('\n');
             if (lineBreak < 0)
             {
-                return false;
+                return null;
             }
 
             var insideTag = false;
@@ -136,7 +138,7 @@ namespace AllYouCanBuy.Helpers
                 }
             }
 
-            return false;
+            return null;
         }
 
         private static void UpdateProgressViews(RerollBlueprintView[] rerollViews, bool hasCycleView)

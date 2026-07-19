@@ -25,6 +25,8 @@ namespace AllYouCanBuy.Views
         private bool _initialised;
         private bool _isCycle;
 
+        internal bool IsCycle => _isCycle;
+
         internal void UpdateState(RerollBlueprintView view, bool isCycle)
         {
             _isCycle = isCycle;
@@ -75,11 +77,7 @@ namespace AllYouCanBuy.Views
                 return;
             }
 
-            var lineBreak = _title.text.IndexOf('\n');
-            var priceLine = lineBreak >= 0
-                ? _title.text.Substring(lineBreak)
-                : string.Empty;
-            _title.text = Label + priceLine;
+            _title.text = Label;
         }
 
         private void OnDestroy()
